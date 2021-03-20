@@ -1,0 +1,2 @@
+Re-generate Thrift sources like this:
+ thrift --out . --gen py -r thrift/simple_switch.thrift
