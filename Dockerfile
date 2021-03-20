@@ -1,4 +1,4 @@
-FROM alpine:latest
+FROM alpine:latest as builder
 
 # Source download dependencies
 RUN apk add --update git bash
@@ -8,7 +8,8 @@ RUN \
   git clone https://github.com/p4lang/behavioral-model.git && \
   git clone https://github.com/p4lang/PI.git && \
   git clone https://github.com/p4lang/p4c && \
-  (cd PI && git submodule update --init --recursive)
+  (cd PI && git submodule update --init --recursive) && \
+  (cd p4c && git submodule update --init --recursive)
 
 RUN wget https://sourceforge.net/projects/judy/files/judy/Judy-1.0.5/Judy-1.0.5.tar.gz
 
@@ -60,6 +61,7 @@ RUN \
   )
 
 # Install P4C
+# TODO: Broken on musl right now, issues filed
 #RUN apk add --update cmake make gcc g++ python3 flex bison \
 #  protobuf-dev grpc-dev boost-dev gc-dev gmp-dev llvm-dev
 #
@@ -68,6 +70,14 @@ RUN \
 #      mkdir build && \
 #      cd build && \
 #      cmake .. && \
-#      make -j4 && \
-#      make -j4 check \
+#      make -j$(nproc) && \
+#      make install \
 #  )
+
+FROM scratch
+WORKDIR /opt/p4
+
+COPY --from=builder /usr/local/bin/simple_switch .
+#COPY --from=builder /usr/local/bin/p4c .
+
+ENTRYPOINT ["/opt/p4/p4c"]
