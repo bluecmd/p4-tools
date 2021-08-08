@@ -1,4 +1,4 @@
-FROM alpine:latest as builder
+FROM alpine:3.14.1 as builder
 
 # Source download dependencies
 RUN apk add --update git bash
@@ -37,7 +37,7 @@ RUN \
   )
 
 # Install behavioral-model
-RUN apk add -X http://dl-cdn.alpinelinux.org/alpine/edge/testing --update \
+RUN apk add -X http://dl-cdn.alpinelinux.org/alpine/edge/community --update \
   thrift thrift-dev
 RUN apk add --update automake autoconf pkgconf gcc g++ make \
   flex bison libtool gmp-dev libpcap-dev boost-dev boost-static
